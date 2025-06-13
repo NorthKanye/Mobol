@@ -12,8 +12,6 @@ export default function MobolLanding() {
   const [scrollY, setScrollY] = useState(0)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState("hero")
-  const [targetScale, setTargetScale] = useState(0.2)
-  const heroRef = useRef(null)
   const mainContainerRef = useRef(null) // Create the ref for the main container
   const servicesRef = useRef(null)
   const aboutRef = useRef(null)
@@ -40,24 +38,10 @@ export default function MobolLanding() {
       }
     }
 
-    // Calculate the target scale for the hero text animation
-    const calculateScale = () => {
-      if (heroRef.current) {
-        const finalSize = 24
-        const initialSize = Number.parseFloat(window.getComputedStyle(heroRef.current).fontSize)
-        if (initialSize > 0) {
-          setTargetScale(finalSize / initialSize)
-        }
-      }
-    }
-
-    calculateScale()
     window.addEventListener("scroll", handleScroll, { passive: true })
-    window.addEventListener("resize", calculateScale)
 
     return () => {
       window.removeEventListener("scroll", handleScroll)
-      window.removeEventListener("resize", calculateScale)
     }
   }, [])
 
@@ -121,13 +105,6 @@ export default function MobolLanding() {
 
   const lerp = (start, end, p) => start * (1 - p) + end * p
 
-  // Hero Title Animation
-  const heroStyle = {
-    opacity: lerp(1, 0, progress),
-    transform: `translateY(${lerp(0, -100, progress)}px) scale(${lerp(1, targetScale, progress)})`,
-    transformOrigin: "center 70%",
-    pointerEvents: "none",
-  }
 
   // Header Logo Animation
   const logoAnimationStartProgress = 0.7
@@ -203,11 +180,27 @@ export default function MobolLanding() {
         <div className="text-center max-w-4xl mx-auto relative z-10">
           {/* Animated Hero Text */}
           <h1
-            ref={heroRef}
-            style={heroStyle}
-            className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight mb-6 leading-none text-white"
+            className="relative text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight mb-6 leading-none text-white"
           >
-            Mob Online
+            <span
+              style={{
+                letterSpacing: `${lerp(0, -0.2, progress)}em`,
+                opacity: lerp(1, 0, progress),
+                display: "inline-block",
+              }}
+            >
+              Mob Online
+            </span>
+            <span
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                opacity: progress,
+              }}
+            >
+              Mobol
+            </span>
           </h1>
 
           <motion.p
