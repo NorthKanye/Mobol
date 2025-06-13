@@ -12,9 +12,10 @@ export default function MobolLanding() {
   const [scrollY, setScrollY] = useState(0)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState("hero")
-  const [targetScale, setTargetScale] = useState(0.2)
-  const heroRef = useRef(null)
   const mainContainerRef = useRef(null) // Create the ref for the main container
+  const heroSectionRef = useRef(null)
+  const heroStartRef = useRef(null)
+  const heroEndRef = useRef(null)
   const servicesRef = useRef(null)
   const aboutRef = useRef(null)
   const valuesRef = useRef(null)
@@ -40,25 +41,40 @@ export default function MobolLanding() {
       }
     }
 
-    // Calculate the target scale for the hero text animation
-    const calculateScale = () => {
-      if (heroRef.current) {
-        const finalSize = 24
-        const initialSize = Number.parseFloat(window.getComputedStyle(heroRef.current).fontSize)
-        if (initialSize > 0) {
-          setTargetScale(finalSize / initialSize)
-        }
-      }
-    }
-
-    calculateScale()
     window.addEventListener("scroll", handleScroll, { passive: true })
-    window.addEventListener("resize", calculateScale)
 
     return () => {
       window.removeEventListener("scroll", handleScroll)
-      window.removeEventListener("resize", calculateScale)
     }
+  }, [])
+
+  useEffect(() => {
+    const gsap = require("gsap")
+    const { ScrollTrigger } = require("gsap/ScrollTrigger")
+
+    gsap.registerPlugin(ScrollTrigger)
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: heroSectionRef.current,
+          start: "top top",
+          end: `+=${animationEndScroll}`,
+          scrub: true,
+          pin: true,
+        },
+      })
+
+      tl.to(heroStartRef.current, { letterSpacing: "-0.2em", opacity: 0 }, 0)
+        .fromTo(
+          heroEndRef.current,
+          { opacity: 0, letterSpacing: "-0.2em" },
+          { opacity: 1, letterSpacing: "0em" },
+          0
+        )
+    }, heroSectionRef)
+
+    return () => ctx.revert()
   }, [])
 
   const services = [
@@ -121,13 +137,6 @@ export default function MobolLanding() {
 
   const lerp = (start, end, p) => start * (1 - p) + end * p
 
-  // Hero Title Animation
-  const heroStyle = {
-    opacity: lerp(1, 0, progress),
-    transform: `translateY(${lerp(0, -100, progress)}px) scale(${lerp(1, targetScale, progress)})`,
-    transformOrigin: "center 70%",
-    pointerEvents: "none",
-  }
 
   // Header Logo Animation
   const logoAnimationStartProgress = 0.7
@@ -180,34 +189,36 @@ export default function MobolLanding() {
       <FootprintAnimation mainContainerRef={mainContainerRef} />
 
       {/* Hero Section */}
-      <section className="bg-black min-h-screen flex items-center justify-center px-4 pt-24 relative overflow-hidden z-10">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.05 }}
-          transition={{ duration: 1.5 }}
-          className="absolute inset-0 pointer-events-none"
-        >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-800/20 to-transparent"></div>
-          <div className="grid grid-cols-10 h-full w-full">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="border-r border-gray-800/10 h-full"></div>
-            ))}
-          </div>
-          <div className="grid grid-rows-10 h-full w-full">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="border-b border-gray-800/10 w-full"></div>
-            ))}
-          </div>
-        </motion.div>
-
-        <div className="text-center max-w-4xl mx-auto relative z-10">
-          {/* Animated Hero Text */}
-          <h1
-            ref={heroRef}
-            style={heroStyle}
-            className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight mb-6 leading-none text-white"
+      <section ref={heroSectionRef} className="bg-black relative overflow-hidden z-10">
+        <div className="h-screen flex items-center justify-center px-4 pt-24 relative">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.05 }}
+            transition={{ duration: 1.5 }}
+            className="absolute inset-0 pointer-events-none"
           >
-            Mob Online
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-800/20 to-transparent"></div>
+            <div className="grid grid-cols-10 h-full w-full">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} className="border-r border-gray-800/10 h-full"></div>
+              ))}
+            </div>
+            <div className="grid grid-rows-10 h-full w-full">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} className="border-b border-gray-800/10 w-full"></div>
+              ))}
+            </div>
+          </motion.div>
+
+          <div className="text-center max-w-4xl mx-auto relative z-10">
+          {/* Animated Hero Text */}
+          <h1 className="relative text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight mb-6 leading-none text-white h-[1em]">
+            <span ref={heroStartRef} className="block">
+              Mob Online
+            </span>
+            <span ref={heroEndRef} className="absolute left-1/2 top-0 -translate-x-1/2">
+              Mobol
+            </span>
           </h1>
 
           <motion.p
@@ -267,6 +278,7 @@ export default function MobolLanding() {
             <ArrowDown className="h-5 w-5 text-white" />
           </motion.div>
         </motion.div>
+        </div>
       </section>
 
       {/* Services Section */}
