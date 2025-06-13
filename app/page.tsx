@@ -157,27 +157,31 @@ export default function MobolLanding() {
       <FootprintAnimation mainContainerRef={mainContainerRef} />
 
       {/* Hero Section */}
-      <section className="bg-black min-h-screen flex items-center justify-center px-4 pt-24 relative overflow-hidden z-10">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.05 }}
-          transition={{ duration: 1.5 }}
-          className="absolute inset-0 pointer-events-none"
-        >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-800/20 to-transparent"></div>
-          <div className="grid grid-cols-10 h-full w-full">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="border-r border-gray-800/10 h-full"></div>
-            ))}
-          </div>
-          <div className="grid grid-rows-10 h-full w-full">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="border-b border-gray-800/10 w-full"></div>
-            ))}
-          </div>
-        </motion.div>
+      <section
+        className="bg-black relative overflow-hidden z-10"
+        style={{ height: `calc(100vh + ${animationEndScroll}px)` }}
+      >
+        <div className="sticky top-0 h-screen flex items-center justify-center px-4 pt-24 relative">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.05 }}
+            transition={{ duration: 1.5 }}
+            className="absolute inset-0 pointer-events-none"
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-800/20 to-transparent"></div>
+            <div className="grid grid-cols-10 h-full w-full">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} className="border-r border-gray-800/10 h-full"></div>
+              ))}
+            </div>
+            <div className="grid grid-rows-10 h-full w-full">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} className="border-b border-gray-800/10 w-full"></div>
+              ))}
+            </div>
+          </motion.div>
 
-        <div className="text-center max-w-4xl mx-auto relative z-10">
+          <div className="text-center max-w-4xl mx-auto relative z-10">
           {/* Animated Hero Text */}
           <h1
             className="relative text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight mb-6 leading-none text-white"
@@ -260,6 +264,7 @@ export default function MobolLanding() {
             <ArrowDown className="h-5 w-5 text-white" />
           </motion.div>
         </motion.div>
+        </div>
       </section>
 
       {/* Services Section */}
