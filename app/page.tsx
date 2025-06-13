@@ -13,6 +13,9 @@ export default function MobolLanding() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState("hero")
   const mainContainerRef = useRef(null) // Create the ref for the main container
+  const heroSectionRef = useRef(null)
+  const heroStartRef = useRef(null)
+  const heroEndRef = useRef(null)
   const servicesRef = useRef(null)
   const aboutRef = useRef(null)
   const valuesRef = useRef(null)
@@ -43,6 +46,35 @@ export default function MobolLanding() {
     return () => {
       window.removeEventListener("scroll", handleScroll)
     }
+  }, [])
+
+  useEffect(() => {
+    const gsap = require("gsap")
+    const { ScrollTrigger } = require("gsap/ScrollTrigger")
+
+    gsap.registerPlugin(ScrollTrigger)
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: heroSectionRef.current,
+          start: "top top",
+          end: `+=${animationEndScroll}`,
+          scrub: true,
+          pin: true,
+        },
+      })
+
+      tl.to(heroStartRef.current, { letterSpacing: "-0.2em", opacity: 0 }, 0)
+        .fromTo(
+          heroEndRef.current,
+          { opacity: 0, letterSpacing: "-0.2em" },
+          { opacity: 1, letterSpacing: "0em" },
+          0
+        )
+    }, heroSectionRef)
+
+    return () => ctx.revert()
   }, [])
 
   const services = [
@@ -157,11 +189,8 @@ export default function MobolLanding() {
       <FootprintAnimation mainContainerRef={mainContainerRef} />
 
       {/* Hero Section */}
-      <section
-        className="bg-black relative overflow-hidden z-10"
-        style={{ height: `calc(100vh + ${animationEndScroll}px)` }}
-      >
-        <div className="sticky top-0 h-screen flex items-center justify-center px-4 pt-24 relative">
+      <section ref={heroSectionRef} className="bg-black relative overflow-hidden z-10">
+        <div className="h-screen flex items-center justify-center px-4 pt-24 relative">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.05 }}
@@ -183,26 +212,11 @@ export default function MobolLanding() {
 
           <div className="text-center max-w-4xl mx-auto relative z-10">
           {/* Animated Hero Text */}
-          <h1
-            className="relative text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight mb-6 leading-none text-white"
-          >
-            <span
-              style={{
-                letterSpacing: `${lerp(0, -0.2, progress)}em`,
-                opacity: lerp(1, 0, progress),
-                display: "inline-block",
-              }}
-            >
+          <h1 className="relative text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight mb-6 leading-none text-white h-[1em]">
+            <span ref={heroStartRef} className="block">
               Mob Online
             </span>
-            <span
-              style={{
-                position: "absolute",
-                left: 0,
-                top: 0,
-                opacity: progress,
-              }}
-            >
+            <span ref={heroEndRef} className="absolute left-1/2 top-0 -translate-x-1/2">
               Mobol
             </span>
           </h1>
